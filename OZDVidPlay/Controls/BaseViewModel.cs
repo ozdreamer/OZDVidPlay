@@ -68,12 +68,5 @@ namespace OZDVidPlay
         public Action<string> ShowInformation;
 
         public Action<ContentPage> Navigate;
-
-        public DatabaseManager DatabaseManager { get; private set; }
-
-        public BaseViewModel()
-        {
-            this.DatabaseManager = new DatabaseManager();
-        }
     }
 }

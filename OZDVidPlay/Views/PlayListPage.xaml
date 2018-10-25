@@ -2,6 +2,7 @@
 <local:BaseContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="OZDVidPlay.PlayListPage"
                  xmlns:local="clr-namespace:OZDVidPlay;assembly=OZDVidPlay">
     <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Play" Clicked="OnPlayVideoClicked"/>
         <ToolbarItem Text="Select" Clicked="OnSelectVideoClicked"/>
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
@@ -9,7 +10,7 @@
             <ListView ItemsSource="{Binding Videos}" HasUnevenRows="true">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <ViewCell BindingContext="{Binding}" Tapped="OnVideoTapped">
+                        <ViewCell BindingContext="{Binding}">
                             <StackLayout Margin="5">
                                 <Label Text="{Binding Id}" FontSize="14" TextColor="Green" FontAttributes="Bold" />
                                 <Label Text="{Binding Name}" FontSize="12" TextColor="Navy" FontAttributes="Italic" />

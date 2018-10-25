@@ -36,19 +36,24 @@ namespace OZDVidPlay
         {
             var video = new Video
             {
-                Id = this.DatabaseManager.NextVideoId,
+                Id = App.DatabaseManager.NextVideoId,
                 PlayListId = this.playList.Id,
                 Name = Guid.NewGuid().ToString(),
                 Path = path
             };
 
-            this.DatabaseManager.AddVideo(video);
+            App.DatabaseManager.AddVideo(video);
             this.Videos.Add(video);
+        }
+
+        public void Play()
+        {
+            this.Navigate?.Invoke(new VideoPlayerPage(this.Videos));
         }
 
         public void LoadVideos()
         {
-            this.Videos = new ObservableCollection<Video>(this.DatabaseManager.GetVideos(playList.Id));
+            this.Videos = new ObservableCollection<Video>(App.DatabaseManager.GetVideos(playList.Id));
         }
     }
 }

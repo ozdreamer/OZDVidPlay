@@ -13,6 +13,8 @@
     <PackageReference Include="Xamarin.Forms" Version="3.1.0.697729" />
     <PackageReference Include="SQLite.Net-PCL" Version="3.1.1" />
     <PackageReference Include="Caliburn.Micro" Version="3.2.0" />
+    <PackageReference Include="Autofac" Version="4.8.1" />
+    <PackageReference Include="Caliburn.Micro.Autofac" Version="1.5.0" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\" />
@@ -26,6 +28,5 @@
   <ItemGroup>
     <Compile Remove="MainPage.xaml.cs" />
     <Compile Remove="Controls\CardViewCell.cs" />
-    <Compile Remove="Database\DatabaseContext.cs" />
   </ItemGroup>
 </Project>

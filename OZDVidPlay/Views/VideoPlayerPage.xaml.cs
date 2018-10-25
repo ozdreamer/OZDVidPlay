@@ -1,31 +1,21 @@
-﻿using System;
-using Xamarin.Forms;
+﻿using System.Collections.Generic;
 
 namespace OZDVidPlay
 {
     public partial class VideoPlayerPage : BaseContentPage
     {
-        public VideoPlayerPage() : base(new VideoPlayerViewModel())
+        private VideoPlayerViewModel pageViewModel => this.ViewModel as VideoPlayerViewModel;
+
+        public VideoPlayerPage(IEnumerable<Video> videos) : base(new VideoPlayerViewModel(videos))
         {
             InitializeComponent();
         }
 
-        async void OnShowVideoLibraryClicked(object sender, EventArgs args)
+        protected override void OnAppearing()
         {
-            Button btn = (Button)sender;
-            btn.IsEnabled = false;
+            base.OnAppearing();
 
-            string filename = await DependencyService.Get<IVideoPicker>().GetVideoFileAsync();
-
-            if (!String.IsNullOrWhiteSpace(filename))
-            {
-                videoPlayer.Source = new FileVideoSource
-                {
-                    File = filename
-                };
-            }
-
-            btn.IsEnabled = true;
+            this.pageViewModel.Play(this.videoPlayer);
         }
     }
 }

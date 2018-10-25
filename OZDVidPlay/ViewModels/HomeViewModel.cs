@@ -32,7 +32,7 @@ namespace OZDVidPlay
 
         public void LoadPlayLists()
         {
-            this.PlayLists = new ObservableCollection<PlayList>(this.DatabaseManager.GetAllPlayLists());
+            this.PlayLists = new ObservableCollection<PlayList>(App.DatabaseManager.GetAllPlayLists());
         }
 
         #endregion

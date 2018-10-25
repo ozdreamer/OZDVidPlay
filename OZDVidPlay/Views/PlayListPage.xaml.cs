@@ -27,9 +27,9 @@ namespace OZDVidPlay
             this.pageViewModel.AddVideoToPlayList(filePath);
         }
 
-        void OnVideoTapped(object sender, EventArgs e)
+        void OnPlayVideoClicked(object sender, System.EventArgs e)
         {
-
+            this.pageViewModel.Play();
         }
     }
 }

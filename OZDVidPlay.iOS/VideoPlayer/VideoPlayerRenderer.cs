@@ -6,13 +6,14 @@ using AVFoundation;
 using AVKit;
 using CoreMedia;
 using Foundation;
+using OZDVidPlay;
+using OZDVidPlay.iOS;
 using UIKit;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.iOS;
 
-[assembly: ExportRenderer(typeof(OZDVidPlay.VideoPlayer),
-                          typeof(OZDVidPlay.iOS.VideoPlayerRenderer))]
+[assembly: ExportRenderer(typeof(VideoPlayer), typeof(VideoPlayerRenderer))]
 
 namespace OZDVidPlay.iOS
 {
@@ -24,7 +25,7 @@ namespace OZDVidPlay.iOS
 
         AVPlayerViewController _playerViewController;
 
-        public override UIViewController ViewController => _playerViewController;
+        public override UIViewController ViewController => this._playerViewController;
 
         protected override void OnElementChanged(ElementChangedEventArgs<VideoPlayer> e)
         {
@@ -34,17 +35,12 @@ namespace OZDVidPlay.iOS
             {
                 if (Control == null)
                 {
-                    // Create AVPlayerViewController
-                    _playerViewController = new AVPlayerViewController();
+                    this._playerViewController = new AVPlayerViewController
+                    {
+                        Player = new AVPlayer()
+                    };
 
-                    // Set Player property to AVPlayer
-                    player = new AVPlayer();
-                    _playerViewController.Player = player;
-
-                    var x = _playerViewController.View;
-
-                    // Use the View from the controller as the native control
-                    SetNativeControl(_playerViewController.View);
+                    SetNativeControl(this._playerViewController.View);
                 }
 
                 SetAreTransportControlsEnabled();
@@ -75,19 +71,19 @@ namespace OZDVidPlay.iOS
             }
         }
 
-        protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs args)
+        protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            base.OnElementPropertyChanged(sender, args);
+            base.OnElementPropertyChanged(sender, e);
 
-            if (args.PropertyName == VideoPlayer.AreTransportControlsEnabledProperty.PropertyName)
+            if (e.PropertyName == VideoPlayer.AreTransportControlsEnabledProperty.PropertyName)
             {
                 SetAreTransportControlsEnabled();
             }
-            else if (args.PropertyName == VideoPlayer.SourceProperty.PropertyName)
+            else if (e.PropertyName == VideoPlayer.SourceProperty.PropertyName)
             {
                 SetSource();
             }
-            else if (args.PropertyName == VideoPlayer.PositionProperty.PropertyName)
+            else if (e.PropertyName == VideoPlayer.PositionProperty.PropertyName)
             {
                 TimeSpan controlPosition = ConvertTime(player.CurrentTime);
 
@@ -188,7 +184,6 @@ namespace OZDVidPlay.iOS
         TimeSpan ConvertTime(CMTime cmTime)
         {
             return TimeSpan.FromSeconds(Double.IsNaN(cmTime.Seconds) ? 0 : cmTime.Seconds);
-
         }
 
         // Event handlers to implement methods

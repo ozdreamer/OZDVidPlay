@@ -5,15 +5,7 @@ namespace OZDVidPlay
 {
     public class HomeViewModel : BaseViewModel
     {
-
-        public HomeViewModel()
-        {
-            this.databaseManager = new DatabaseManager();
-        }
-
         #region Fields and Properties
-
-        private DatabaseManager databaseManager;
 
         private ObservableCollection<PlayList> playLists;
 
@@ -40,7 +32,7 @@ namespace OZDVidPlay
 
         public void LoadPlayLists()
         {
-            this.PlayLists = new ObservableCollection<PlayList>(this.databaseManager.GetAllPlayLists());
+            this.PlayLists = new ObservableCollection<PlayList>(this.DatabaseManager.GetAllPlayLists());
         }
 
         #endregion

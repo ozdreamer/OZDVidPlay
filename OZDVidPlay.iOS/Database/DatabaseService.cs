@@ -27,6 +27,7 @@ namespace OZDVidPlay.iOS
             if (!File.Exists(path))
             {
                 var existingDb = NSBundle.MainBundle.PathForResource(DatabaseManager.DatabaseFileName, DatabaseManager.DatabaseFileExtension);
+                //File.Delete(path);
                 File.Copy(existingDb, path);
             }
 

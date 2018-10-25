@@ -17,7 +17,7 @@ namespace OZDVidPlay.iOS
             // Create and define UIImagePickerController
             imagePicker = new UIImagePickerController
             {
-                SourceType = UIImagePickerControllerSourceType.SavedPhotosAlbum,
+                SourceType = UIImagePickerControllerSourceType.PhotoLibrary,
                 MediaTypes = new string[] { "public.movie" }
             };
 
@@ -28,7 +28,7 @@ namespace OZDVidPlay.iOS
             // Present UIImagePickerController;
             UIWindow window = UIApplication.SharedApplication.KeyWindow;
             var viewController = window.RootViewController;
-            viewController.PresentModalViewController(imagePicker, true);
+            viewController.PresentViewController(imagePicker, true, null);
 
             // Return Task object
             taskCompletionSource = new TaskCompletionSource<string>();
@@ -45,6 +45,7 @@ namespace OZDVidPlay.iOS
             {
                 taskCompletionSource.SetResult(null);
             }
+
             imagePicker.DismissModalViewController(true);
             DetachHandlers();
         }

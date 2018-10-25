@@ -1,9 +1,7 @@
-﻿using System;
-using SQLite.Net;
+﻿using SQLite.Net;
 using System.Collections.Generic;
-using Xamarin.Forms;
 using System.Linq;
-using System.Threading.Tasks;
+using Xamarin.Forms;
 
 namespace OZDVidPlay
 {
@@ -24,5 +22,23 @@ namespace OZDVidPlay
         {
             return this.dbConnection.Query<PlayList>("SELECT * FROM PlayList");
         }
+
+        public List<Video> GetVideos(int playListId)
+        {
+            return this.dbConnection.Query<Video>($"SELECT * FROM Video WHERE PlayListId = {playListId}");
+        }
+
+        public Video AddVideo(Video video)
+        {
+            var videoId = this.dbConnection.InsertOrReplace(video);
+            return this.GetVideo(videoId);
+        }
+
+        public Video GetVideo(int videoId)
+        {
+            return this.dbConnection.Query<Video>($"SELECT * FROM Video WHERE Id = {videoId}").FirstOrDefault();
+        }
+
+        public int NextVideoId => this.dbConnection.ExecuteScalar<int>("SELECT MAX(Id) FROM Video") + 1;
     }
 }

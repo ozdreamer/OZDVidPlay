@@ -19,7 +19,9 @@ namespace OZDVidPlay.iOS
     public class VideoPlayerRenderer : ViewRenderer<VideoPlayer, UIView>
     {
         AVPlayer player;
+     
         AVPlayerItem playerItem;
+
         AVPlayerViewController _playerViewController;
 
         public override UIViewController ViewController => _playerViewController;

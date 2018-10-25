@@ -3,8 +3,6 @@
                        xmlns:local="clr-namespace:OZDVidPlay;assembly=OZDVidPlay"
                        Title="Play Library Video">
     <StackLayout Orientation="Vertical">
-        <video:VideoPlayer x:Name="videoPlayer"/>
-        <Button x:Name="buttonSelectVideo" Text="Show Video Library"
-                Clicked="OnShowVideoLibraryClicked" />
+        <video:VideoPlayer x:Name="videoPlayer" />
     </StackLayout>
 </local:BaseContentPage>

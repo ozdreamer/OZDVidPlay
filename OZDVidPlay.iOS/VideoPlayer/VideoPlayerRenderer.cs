@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-
+using System.Linq;
 using AVFoundation;
 using AVKit;
+using CoreGraphics;
 using CoreMedia;
 using Foundation;
 using OZDVidPlay;
@@ -11,6 +12,7 @@ using OZDVidPlay.iOS;
 using UIKit;
 
 using Xamarin.Forms;
+using Xamarin.Forms.Internals;
 using Xamarin.Forms.Platform.iOS;
 
 [assembly: ExportRenderer(typeof(VideoPlayer), typeof(VideoPlayerRenderer))]
@@ -19,13 +21,11 @@ namespace OZDVidPlay.iOS
 {
     public class VideoPlayerRenderer : ViewRenderer<VideoPlayer, UIView>
     {
-        AVPlayer player;
+        AVQueuePlayer player;
      
-        AVPlayerItem playerItem;
+        AVPlayerViewController playerViewController;
 
-        AVPlayerViewController _playerViewController;
-
-        public override UIViewController ViewController => this._playerViewController;
+        public override UIViewController ViewController => this.playerViewController;
 
         protected override void OnElementChanged(ElementChangedEventArgs<VideoPlayer> e)
         {
@@ -33,31 +33,48 @@ namespace OZDVidPlay.iOS
 
             if (e.NewElement != null)
             {
-                if (Control == null)
+                if (this.Control == null)
                 {
-                    this._playerViewController = new AVPlayerViewController
+                    // Create AVPlayerViewController
+                    this.playerViewController = new AVPlayerViewController
                     {
-                        Player = new AVPlayer()
+                        ShowsPlaybackControls = true,
+                        EntersFullScreenWhenPlaybackBegins = true,
+                        ExitsFullScreenWhenPlaybackEnds = true
                     };
 
-                    SetNativeControl(this._playerViewController.View);
+                    // Set Player property to AVPlayer
+                    this.player = new AVQueuePlayer
+                    {
+                        ActionAtItemEnd = AVPlayerActionAtItemEnd.Advance,
+                        AllowsExternalPlayback = true,
+                        UsesExternalPlaybackWhileExternalScreenIsActive = true
+                    };
+
+                    this.playerViewController.Player = this.player;
+
+                    var view = this.playerViewController.View;
+                    var playerLayer = AVPlayerLayer.FromPlayer(this.player);
+                    playerLayer.Frame = view.Frame;
+                    playerLayer.Bounds = view.Bounds;
+                    view.Layer.AddSublayer(playerLayer);
+
+                    // Use the View from the controller as the native control
+                    this.SetNativeControl(view);
                 }
 
-                SetAreTransportControlsEnabled();
-                SetSource();
-
-                e.NewElement.UpdateStatus += OnUpdateStatus;
-                e.NewElement.PlayRequested += OnPlayRequested;
-                e.NewElement.PauseRequested += OnPauseRequested;
-                e.NewElement.StopRequested += OnStopRequested;
+                e.NewElement.UpdateStatus += this.OnUpdateStatus;
+                e.NewElement.PlayRequested += this.OnPlayRequested;
+                e.NewElement.PauseRequested += this.OnPauseRequested;
+                e.NewElement.StopRequested += this.OnStopRequested;
             }
 
             if (e.OldElement != null)
             {
-                e.OldElement.UpdateStatus -= OnUpdateStatus;
-                e.OldElement.PlayRequested -= OnPlayRequested;
-                e.OldElement.PauseRequested -= OnPauseRequested;
-                e.OldElement.StopRequested -= OnStopRequested;
+                e.OldElement.UpdateStatus -= this.OnUpdateStatus;
+                e.OldElement.PlayRequested -= this.OnPlayRequested;
+                e.OldElement.PauseRequested -= this.OnPauseRequested;
+                e.OldElement.StopRequested -= this.OnStopRequested;
             }
         }
 
@@ -65,9 +82,9 @@ namespace OZDVidPlay.iOS
         {
             base.Dispose(disposing);
 
-            if (player != null)
+            if (this.player != null)
             {
-                player.ReplaceCurrentItemWithPlayerItem(null);
+                this.player.ReplaceCurrentItemWithPlayerItem(null);
             }
         }
 
@@ -75,81 +92,39 @@ namespace OZDVidPlay.iOS
         {
             base.OnElementPropertyChanged(sender, e);
 
-            if (e.PropertyName == VideoPlayer.AreTransportControlsEnabledProperty.PropertyName)
+            if (e.PropertyName == VideoPlayer.SourceProperty.PropertyName)
             {
-                SetAreTransportControlsEnabled();
-            }
-            else if (e.PropertyName == VideoPlayer.SourceProperty.PropertyName)
-            {
-                SetSource();
+                this.SetSource();
             }
             else if (e.PropertyName == VideoPlayer.PositionProperty.PropertyName)
             {
-                TimeSpan controlPosition = ConvertTime(player.CurrentTime);
-
+                var controlPosition = ConvertTime(this.player.CurrentTime);
                 if (Math.Abs((controlPosition - Element.Position).TotalSeconds) > 1)
                 {
-                    player.Seek(CMTime.FromSeconds(Element.Position.TotalSeconds, 1));
+                    this.player.Seek(CMTime.FromSeconds(Element.Position.TotalSeconds, 1));
                 }
             }
-        }
-
-        void SetAreTransportControlsEnabled()
-        {
-            ((AVPlayerViewController)ViewController).ShowsPlaybackControls = Element.AreTransportControlsEnabled;
         }
 
         void SetSource()
         {
-            AVAsset asset = null;
-
-            if (Element.Source is UriVideoSource)
+            if (this.Element.Source is IEnumerable<FileVideoSource> sources)
             {
-                string uri = (Element.Source as UriVideoSource).Uri;
+                this.player.RemoveAllItems();
 
-                if (!String.IsNullOrWhiteSpace(uri))
+                AVPlayerItem lastPlayerItem = null;
+                sources.Where(x => !string.IsNullOrWhiteSpace(x.File)).ForEach(x =>
                 {
-                    asset = AVAsset.FromUrl(new NSUrl(uri));
-                }
-            }
-            else if (Element.Source is FileVideoSource)
-            {
-                string uri = (Element.Source as FileVideoSource).File;
+                    var currentPlayerItem = new AVPlayerItem(AVAsset.FromUrl(new NSUrl(x.File)));
+                    if (this.player.CanInsert(currentPlayerItem, lastPlayerItem))
+                    {
+                        this.player.InsertItem(currentPlayerItem, lastPlayerItem);
+                        lastPlayerItem = currentPlayerItem;
+                    }
+                });
 
-                if (!String.IsNullOrWhiteSpace(uri))
-                {
-                    asset = AVAsset.FromUrl(new NSUrl(uri));
-                }
-            }
-            else if (Element.Source is ResourceVideoSource)
-            {
-                string path = (Element.Source as ResourceVideoSource).Path;
-
-                if (!String.IsNullOrWhiteSpace(path))
-                {
-                    string directory = Path.GetDirectoryName(path);
-                    string filename = Path.GetFileNameWithoutExtension(path);
-                    string extension = Path.GetExtension(path).Substring(1);
-                    NSUrl url = NSBundle.MainBundle.GetUrlForResource(filename, extension, directory);
-                    asset = AVAsset.FromUrl(url);
-                }
-            }
-
-            if (asset != null)
-            {
-                playerItem = new AVPlayerItem(asset);
-            }
-            else
-            {
-                playerItem = null;
-            }
-
-            player.ReplaceCurrentItemWithPlayerItem(playerItem);
-
-            if (playerItem != null && Element.AutoPlay)
-            {
-                player.Play();
-            }
+                //this.player.ReplaceCurrentItemWithPlayerItem(lastPlayerItem);
+                            }
         }
 
         // Event handler to update status
@@ -157,10 +132,10 @@ namespace OZDVidPlay.iOS
         {
             VideoStatus videoStatus = VideoStatus.NotReady;
 
-            switch (player.Status)
+            switch (this.player.Status)
             {
                 case AVPlayerStatus.ReadyToPlay:
-                    switch (player.TimeControlStatus)
+                    switch (this.player.TimeControlStatus)
                     {
                         case AVPlayerTimeControlStatus.Playing:
                             videoStatus = VideoStatus.Playing;
@@ -174,10 +149,11 @@ namespace OZDVidPlay.iOS
             }
             ((IVideoPlayerController)Element).Status = videoStatus;
 
+            var playerItem = this.player.CurrentItem;
             if (playerItem != null)
             {
-                ((IVideoPlayerController)Element).Duration = ConvertTime(playerItem.Duration);
-                ((IElementController)Element).SetValueFromRenderer(VideoPlayer.PositionProperty, ConvertTime(playerItem.CurrentTime));
+                ((IVideoPlayerController)Element).Duration = this.ConvertTime(playerItem.Duration);
+                ((IElementController)Element).SetValueFromRenderer(VideoPlayer.PositionProperty, this.ConvertTime(playerItem.CurrentTime));
             }
         }
 
@@ -189,18 +165,18 @@ namespace OZDVidPlay.iOS
         // Event handlers to implement methods
         void OnPlayRequested(object sender, EventArgs args)
         {
-            player.Play();
+            this.player.Play();
         }
 
         void OnPauseRequested(object sender, EventArgs args)
         {
-            player.Pause();
+            this.player.Pause();
         }
 
         void OnStopRequested(object sender, EventArgs args)
         {
-            player.Pause();
-            player.Seek(new CMTime(0, 1));
+            this.player.Pause();
+            this.player.Seek(new CMTime(0, 1));
         }
     }
 }

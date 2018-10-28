@@ -21,9 +21,9 @@ namespace OZDVidPlay
                 this.DisplayAlert("Information", message, "Cancel");
             };
 
-            viewModel.Navigate = (page) =>
+            viewModel.Navigate = async (page) =>
             {
-                Navigation.PushAsync(page);
+                await Navigation.PushAsync(page);
             };
         }
     }

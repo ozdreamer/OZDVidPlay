@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using Plugin.Media;
 using Xamarin.Forms;
 
 namespace OZDVidPlay
@@ -27,9 +27,14 @@ namespace OZDVidPlay
             this.pageViewModel.AddVideoToPlayList(filePath);
         }
 
-        void OnPlayVideoClicked(object sender, System.EventArgs e)
+        void OnPlayVideoClicked(object sender, EventArgs e)
         {
             this.pageViewModel.Play();
+        }
+
+        void OnRemoveVideoClicked(object sender, System.EventArgs e)
+        {
+            this.pageViewModel.Remove();
         }
     }
 }

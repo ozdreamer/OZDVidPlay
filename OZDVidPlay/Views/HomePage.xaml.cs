@@ -1,4 +1,5 @@
-﻿using Xamarin.Forms;
+﻿using System;
+using Xamarin.Forms;
 
 namespace OZDVidPlay
 {
@@ -14,13 +15,13 @@ namespace OZDVidPlay
         protected override void OnAppearing()
         {
             base.OnAppearing();
+
             this.pageViewModel.LoadPlayLists();
         }
 
-        void OnPlayListTapped(object sender, System.EventArgs e)
+        void OnPlayListTapped(object sender, EventArgs e)
         {
-            var playList = (sender as ViewCell).BindingContext as PlayList;
-            Navigation.PushAsync(new PlayListPage(playList));
+            this.pageViewModel.OpenPlayList((sender as ViewCell).BindingContext as PlayList);
         }
     }
 }

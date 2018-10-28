@@ -15,6 +15,7 @@
     <PackageReference Include="Caliburn.Micro" Version="3.2.0" />
     <PackageReference Include="Autofac" Version="4.8.1" />
     <PackageReference Include="Caliburn.Micro.Autofac" Version="1.5.0" />
+    <PackageReference Include="Xam.Plugin.Media" Version="4.0.1.5" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\" />

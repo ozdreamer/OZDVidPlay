@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Xamarin.Forms;
 
 namespace OZDVidPlay
@@ -28,13 +29,13 @@ namespace OZDVidPlay
 
         // Source property
         public static readonly BindableProperty SourceProperty =
-            BindableProperty.Create(nameof(Source), typeof(VideoSource), typeof(VideoPlayer), null);
+            BindableProperty.Create(nameof(Source), typeof(IEnumerable<VideoSource>), typeof(VideoPlayer), null);
 
         [TypeConverter(typeof(VideoSourceConverter))]
-        public VideoSource Source
+        public IEnumerable<VideoSource> Source
         {
             set { SetValue(SourceProperty, value); }
-            get { return (VideoSource)GetValue(SourceProperty); }
+            get { return (IEnumerable<VideoSource>)GetValue(SourceProperty); }
         }
 
         // AutoPlay property

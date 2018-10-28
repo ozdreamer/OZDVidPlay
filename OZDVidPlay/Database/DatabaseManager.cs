@@ -1,4 +1,5 @@
 ﻿using SQLite.Net;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xamarin.Forms;
@@ -40,5 +41,15 @@ namespace OZDVidPlay
         }
 
         public int NextVideoId => this.dbConnection.ExecuteScalar<int>("SELECT MAX(Id) FROM Video") + 1;
+
+        public bool RemoveVideo(int videoId)
+        {
+            return this.dbConnection.Execute($"DELETE FROM Video WHERE Id = {videoId}") > 0;
+        }
+
+        public int NextVideoSequence(int playListId)
+        {
+            return this.dbConnection.ExecuteScalar<int>($"SELECT COALESCE(MAX(Sequence),1) FROM Video WHERE PlayListId = {playListId}");
+        }
     }
 }

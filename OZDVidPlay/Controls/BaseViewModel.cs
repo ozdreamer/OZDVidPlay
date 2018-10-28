@@ -63,10 +63,14 @@ namespace OZDVidPlay
             set { Set(ref canLoadMore, value, nameof(this.CanLoadMore)); }
         }
 
+        protected DatabaseManager Db => App.DatabaseManager;
+
         public Action<string> ShowError;
 
         public Action<string> ShowInformation;
 
-        public Action<ContentPage> Navigate;
+        public Action<Page> Navigate;
+
+        protected Page CreatePage(Type pageType, params object[] args) => Activator.CreateInstance(pageType, args) as Page;
     }
 }

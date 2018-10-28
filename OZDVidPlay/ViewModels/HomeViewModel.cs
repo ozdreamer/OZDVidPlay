@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
 namespace OZDVidPlay
 {
@@ -26,13 +25,18 @@ namespace OZDVidPlay
             }
         }
 
+        public void OpenPlayList(PlayList playList)
+        {
+            this.Navigate?.Invoke(this.CreatePage(typeof(PlayListPage), playList));
+        }
+
         #endregion
 
         #region Methods
 
         public void LoadPlayLists()
         {
-            this.PlayLists = new ObservableCollection<PlayList>(App.DatabaseManager.GetAllPlayLists());
+            this.PlayLists = new ObservableCollection<PlayList>(this.Db.GetAllPlayLists());
         }
 
         #endregion

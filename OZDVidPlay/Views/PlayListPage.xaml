@@ -2,20 +2,27 @@
 <local:BaseContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="OZDVidPlay.PlayListPage"
                  xmlns:local="clr-namespace:OZDVidPlay;assembly=OZDVidPlay">
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Play" Clicked="OnPlayVideoClicked"/>
+        <ToolbarItem Text="Play" Clicked="OnPlayVideoClicked" />
         <ToolbarItem Text="Select" Clicked="OnSelectVideoClicked"/>
+        <ToolbarItem Text="Remove" Clicked="OnRemoveVideoClicked"/>
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <StackLayout>
-            <ListView ItemsSource="{Binding Videos}" HasUnevenRows="true">
+            <ListView ItemsSource="{Binding Videos}" SelectedItem="{Binding SelectedVideo}" HasUnevenRows="true">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell BindingContext="{Binding}">
-                            <StackLayout Margin="5">
-                                <Label Text="{Binding Id}" FontSize="14" TextColor="Green" FontAttributes="Bold" />
-                                <Label Text="{Binding Name}" FontSize="12" TextColor="Navy" FontAttributes="Italic" />
-                                <Label Text="{Binding Path}" FontSize="10" TextColor="Gray" />
-                            </StackLayout>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackLayout Margin="5" Grid.Column="1">
+                                    <Label Text="{Binding Id}" FontSize="14" TextColor="Green" FontAttributes="Bold" />
+                                    <Label Text="{Binding Name}" FontSize="12" TextColor="Navy" FontAttributes="Italic" />
+                                    <Label Text="{Binding Path}" FontSize="10" TextColor="Gray" />
+                                </StackLayout>
+                            </Grid>
                         </ViewCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>

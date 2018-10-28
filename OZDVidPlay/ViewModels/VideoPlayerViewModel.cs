@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace OZDVidPlay
 {
@@ -14,11 +15,8 @@ namespace OZDVidPlay
 
         public void Play(VideoPlayer player)
         {
-            foreach (var video in this.videos)
-            {
-                player.Source = VideoSource.FromFile(video.Path);
-                player.Play();
-            }
+            player.Source = this.videos.Select(v => new FileVideoSource { File = v.Path });
+            player.Play();
         }
     }
 }

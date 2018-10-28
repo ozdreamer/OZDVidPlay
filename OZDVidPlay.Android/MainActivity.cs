@@ -1,13 +1,9 @@
-﻿using System;
-
+﻿using System.Threading.Tasks;
 using Android.App;
-using Android.Content.PM;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
-using Android.OS;
-using System.Threading.Tasks;
 using Android.Content;
+using Android.Content.PM;
+using Android.OS;
+using Plugin.CurrentActivity;
 
 namespace OZDVidPlay.Droid
 {
@@ -30,6 +26,8 @@ namespace OZDVidPlay.Droid
 
             Current = this;
 
+            CrossCurrentActivity.Current.Init(this, savedInstanceState);
+
             LoadApplication(new App());
         }
 
@@ -49,6 +47,11 @@ namespace OZDVidPlay.Droid
                     PickImageTaskCompletionSource.SetResult(null);
                 }
             }
+        }
+
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
+        {
+            Plugin.Permissions.PermissionsImplementation.Current.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 }
